@@ -29,7 +29,7 @@ final class Map implements Collection, \ArrayAccess
      *
      * @psalm-var array<int, Pair>
      */
-    private $pairs = [];
+    private array $pairs = [];
 
     /**
      * Creates a new instance.
@@ -54,7 +54,7 @@ final class Map implements Collection, \ArrayAccess
      *
      * @psalm-param callable(TKey, TValue): TValue $callback
      */
-    public function apply(callable $callback)
+    public function apply(callable $callback): void
     {
         foreach ($this->pairs as &$pair) {
             $pair->value = $callback($pair->key, $pair->value);
@@ -64,7 +64,7 @@ final class Map implements Collection, \ArrayAccess
     /**
      * @inheritDoc
      */
-    public function clear()
+    public function clear(): void
     {
         $this->pairs = [];
         $this->capacity = self::MIN_CAPACITY;
@@ -128,7 +128,7 @@ final class Map implements Collection, \ArrayAccess
      * Returns the result of associating all keys of a given traversable object
      * or array with their corresponding values, as well as those of this map.
      *
-     * @param array|\Traversable $values
+     * @param iterable $values
      *
      * @return Map
      *
@@ -137,7 +137,7 @@ final class Map implements Collection, \ArrayAccess
      * @psalm-param iterable<TKey2, TValue2> $values
      * @psalm-return Map<TKey|TKey2, TValue|TValue2>
      */
-    public function merge($values): Map
+    public function merge(iterable $values): Map
     {
         $merged = new self($this);
         $merged->putAll($values);
@@ -197,9 +197,9 @@ final class Map implements Collection, \ArrayAccess
      * @psalm-param TKey $a
      * @psalm-param TKey $b
      */
-    private function keysAreEqual($a, $b): bool
+    private function keysAreEqual(mixed $a, mixed $b): bool
     {
-        if (is_object($a) && $a instanceof Hashable) {
+        if ($a instanceof Hashable) {
             return get_class($a) === get_class($b) && $a->equals($b);
         }
 
@@ -215,7 +215,7 @@ final class Map implements Collection, \ArrayAccess
      *
      * @psalm-return Pair<TKey, TValue>|null
      */
-    private function lookupKey($key)
+    private function lookupKey($key): ?Pair
     {
         foreach ($this->pairs as $pair) {
             if ($this->keysAreEqual($pair->key, $key)) {
@@ -233,7 +233,7 @@ final class Map implements Collection, \ArrayAccess
      *
      * @psalm-return Pair<TKey, TValue>|null
      */
-    private function lookupValue($value)
+    private function lookupValue($value): ?Pair
     {
         foreach ($this->pairs as $pair) {
             if ($pair->value === $value) {
@@ -249,7 +249,7 @@ final class Map implements Collection, \ArrayAccess
      *
      * @psalm-param TKey $key
      */
-    public function hasKey($key): bool
+    public function hasKey(mixed $key): bool
     {
         return $this->lookupKey($key) !== null;
     }
@@ -261,7 +261,7 @@ final class Map implements Collection, \ArrayAccess
      *
      * @psalm-param TValue $value
      */
-    public function hasValue($value): bool
+    public function hasValue(mixed $value): bool
     {
         return $this->lookupValue($value) !== null;
     }
@@ -305,7 +305,7 @@ final class Map implements Collection, \ArrayAccess
      * key is not associated with a value.
      *
      * @param mixed $key
-     * @param mixed $default
+     * @param mixed|null $default
      *
      * @return mixed The associated value or fallback default if provided.
      *
@@ -317,7 +317,7 @@ final class Map implements Collection, \ArrayAccess
      * @psalm-param TDefault $default
      * @psalm-return TValue|TDefault
      */
-    public function get($key, $default = null)
+    public function get(mixed $key, mixed $default = null)
     {
         if (($pair = $this->lookupKey($key))) {
             return $pair->value;
@@ -397,7 +397,7 @@ final class Map implements Collection, \ArrayAccess
      * @psalm-param TKey $key
      * @psalm-param TValue $value
      */
-    public function put($key, $value)
+    public function put(mixed $key, mixed $value): void
     {
         $pair = $this->lookupKey($key);
 
@@ -418,7 +418,7 @@ final class Map implements Collection, \ArrayAccess
      *
      * @psalm-param iterable<TKey, TValue> $values
      */
-    public function putAll(iterable $values)
+    public function putAll(iterable $values): void
     {
         foreach ($values as $key => $value) {
             $this->put($key, $value);
@@ -441,7 +441,7 @@ final class Map implements Collection, \ArrayAccess
      * @psalm-param TCarry $initial
      * @psalm-return TCarry
      */
-    public function reduce(callable $callback, $initial = null)
+    public function reduce(callable $callback, mixed $initial = null)
     {
         $carry = $initial;
 
@@ -476,7 +476,7 @@ final class Map implements Collection, \ArrayAccess
      * or a provided default if provided.
      *
      * @param mixed $key
-     * @param mixed $default
+     * @param mixed|null $default
      *
      * @return mixed The associated value or fallback default if provided.
      *
@@ -488,7 +488,7 @@ final class Map implements Collection, \ArrayAccess
      * @psalm-param TDefault $default
      * @psalm-return TValue|TDefault
      */
-    public function remove($key, $default = null)
+    public function remove(mixed $key, mixed $default = null)
     {
         foreach ($this->pairs as $position => $pair) {
             if ($this->keysAreEqual($pair->key, $key)) {
@@ -507,7 +507,7 @@ final class Map implements Collection, \ArrayAccess
     /**
      * Reverses the map in-place
      */
-    public function reverse()
+    public function reverse(): void
     {
         $this->pairs = array_reverse($this->pairs);
     }
@@ -578,7 +578,7 @@ final class Map implements Collection, \ArrayAccess
      *
      * @psalm-param (callable(TValue, TValue): int)|null $comparator
      */
-    public function sort(callable $comparator = null)
+    public function sort(callable $comparator = null): void
     {
         if ($comparator) {
             usort($this->pairs, function($a, $b) use ($comparator) {
@@ -619,7 +619,7 @@ final class Map implements Collection, \ArrayAccess
      *
      * @psalm-param (callable(TKey, TKey): int)|null $comparator
      */
-    public function ksort(callable $comparator = null)
+    public function ksort(callable $comparator = null): void
     {
         if ($comparator) {
             usort($this->pairs, function($a, $b) use ($comparator) {
@@ -656,7 +656,7 @@ final class Map implements Collection, \ArrayAccess
      *
      * @return int|float The sum of all the values in the map.
      */
-    public function sum()
+    public function sum(): float|int
     {
         return $this->values()->sum();
     }
@@ -735,7 +735,7 @@ final class Map implements Collection, \ArrayAccess
      * @inheritDoc
      */
     #[\ReturnTypeWillChange]
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         foreach ($this->pairs as $pair) {
             yield $pair->key => $pair->value;
@@ -756,7 +756,7 @@ final class Map implements Collection, \ArrayAccess
      * @inheritdoc
      */
     #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->put($offset, $value);
     }
@@ -767,7 +767,7 @@ final class Map implements Collection, \ArrayAccess
      * @throws OutOfBoundsException
      */
     #[\ReturnTypeWillChange]
-    public function &offsetGet($offset)
+    public function &offsetGet($offset): mixed
     {
         $pair = $this->lookupKey($offset);
 
@@ -781,7 +781,7 @@ final class Map implements Collection, \ArrayAccess
      * @inheritdoc
      */
     #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->remove($offset, null);
     }
@@ -790,7 +790,7 @@ final class Map implements Collection, \ArrayAccess
      * @inheritdoc
      */
     #[\ReturnTypeWillChange]
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->get($offset, null) !== null;
     }
@@ -799,12 +799,12 @@ final class Map implements Collection, \ArrayAccess
      * Returns a representation that can be natively converted to JSON, which is
      * called when invoking json_encode.
      *
-     * @return mixed
+     * @return object
      *
      * @see \JsonSerializable
      */
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): object
     {
         return (object) $this->toArray();
     }

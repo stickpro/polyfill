@@ -21,25 +21,25 @@ final class Pair implements \JsonSerializable
      *
      * @psalm-param TKey $key
      */
-    public $key;
+    public mixed $key;
 
     /**
      * @var mixed The pair's value
      *
      * @psalm-param TValue $value
      */
-    public $value;
+    public mixed $value;
 
     /**
      * Creates a new instance.
      *
-     * @param mixed $key
-     * @param mixed $value
+     * @param mixed|null $key
+     * @param mixed|null $value
      *
      * @psalm-param TKey $key
      * @psalm-param TValue $value
      */
-    public function __construct($key = null, $value = null)
+    public function __construct(mixed $key = null, mixed $value = null)
     {
         $this->key   = $key;
         $this->value = $value;
@@ -51,7 +51,7 @@ final class Pair implements \JsonSerializable
      *
      * @return mixed|null
      */
-    public function __isset($name)
+    public function __isset(mixed $name)
     {
         if ($name === 'key' || $name === 'value') {
             return $this->$name !== null;
@@ -79,7 +79,7 @@ final class Pair implements \JsonSerializable
      *
      * @return mixed|null
      */
-    public function &__get($name)
+    public function &__get(mixed $name)
     {
         if ($name === 'key' || $name === 'value') {
             return $this->$name;
@@ -93,7 +93,7 @@ final class Pair implements \JsonSerializable
      *
      * @return mixed|null
      */
-    public function __set($name, $value)
+    public function __set(mixed $name, mixed $value)
     {
         if ($name === 'key' || $name === 'value') {
             $this->$name = $value;
@@ -143,7 +143,7 @@ final class Pair implements \JsonSerializable
      * @psalm-return array{key: TKey, value: TValue}
      */
     #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }
@@ -151,7 +151,7 @@ final class Pair implements \JsonSerializable
     /**
      * Returns a string representation of the pair.
      */
-    public function __toString()
+    public function __toString(): string
     {
         return 'object(' . get_class($this) . ')';
     }
