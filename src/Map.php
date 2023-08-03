@@ -215,7 +215,7 @@ final class Map implements Collection, \ArrayAccess
      *
      * @psalm-return Pair<TKey, TValue>|null
      */
-    private function lookupKey($key): ?Pair
+    private function lookupKey($key)
     {
         foreach ($this->pairs as $pair) {
             if ($this->keysAreEqual($pair->key, $key)) {
